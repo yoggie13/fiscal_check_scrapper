@@ -1,4 +1,3 @@
-from cv2 import scaleAdd
 import qrcode
 import scrapper
 
