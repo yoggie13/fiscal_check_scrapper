@@ -1,25 +1,22 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-import os
 
 
 def scrape_web_page(link):
     load_dotenv()
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--no-sandbox")
 
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    driver = webdriver.Chrome(executable_path="C:\\chromeData\\chromedriver.exe", options=chrome_options)
     driver.get(link)
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
-    div = soup.find("div", {"class": "col-lg-12 text-center centered"})
+    div = soup.findAll("div", {"class": "col-lg-12 text-center centered"})[1]
     bill = div.find("pre")
 
     print(bill.text)
