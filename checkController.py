@@ -24,5 +24,5 @@ def insertCheck (userID, link):
     databaseController.insertInTransaction("checkitems", "CheckID, CheckItemID, CategoryID, Name, Quantity, PricePerItem, TotalPrice",
                                            "%s, %s, %s, %s, %s, %s, %s",
                                            items, cursor)
-    databaseController.commit()
+    return databaseController.commit()
     

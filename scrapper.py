@@ -53,7 +53,6 @@ def scrape_web_page(link):
             float(tr.find("td", {"data-bind": "decimalAsText: UnitPrice"}).text.strip().replace(".", "").replace(",",".")),
             float(tr.find("td", {"data-bind": "decimalAsText: Total"}).text.strip().replace(".", "").replace(",","."))
         )
-        print(item)
 
         items.append(item)
         

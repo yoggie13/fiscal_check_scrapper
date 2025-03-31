@@ -26,6 +26,7 @@ def commit():
     if transactionCheck:
         try:
             mydb.commit()
+            return True
         except Exception as e:
             return False
     else:
