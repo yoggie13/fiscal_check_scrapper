@@ -12,17 +12,17 @@ def insertCheck (userID, link):
     cursor = databaseController.start_transaction()
 
     #insert check
-    checkID = databaseController.insertInTransaction("checks", "Link, Date, Total, ShopID, UserID, Bill",
-                               "%s, %s, %s, %s, %s, %s",
-                               (link, date, total, 1, 1, checkData['bill']), cursor)
+    checkID = databaseController.insertInTransaction("checks", "Link, Date, Total, ShopID, UserID, Bill, UserPaid, CategoryID",
+                               "%s, %s, %s, %s, %s, %s, %s, %s",
+                               (link, date, total, 1, 1, checkData['bill'], total, 1), cursor)
     
-    items = [(checkID, i, 1, ) + checkData['items'][i] for i in range(0, len(checkData['items']))]
+    items = [(checkID, i, ) + checkData['items'][i] for i in range(0, len(checkData['items']))]
 
     #finish category insert algorithm!
 
     #insert items
-    databaseController.insertInTransaction("checkitems", "CheckID, CheckItemID, CategoryID, Name, Quantity, PricePerItem, TotalPrice",
-                                           "%s, %s, %s, %s, %s, %s, %s",
+    databaseController.insertInTransaction("checkitems", "CheckID, CheckItemID, Name, Quantity, PricePerItem, TotalPrice",
+                                           "%s, %s, %s, %s, %s, %s",
                                            items, cursor)
     return databaseController.commit()
     
