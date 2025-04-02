@@ -1,7 +1,7 @@
 import databaseController
 import scrapper
 from datetime import datetime
-
+import pprint
 def insertCheck (userID, link):
     checkData = scrapper.scrape_web_page(link)
 
@@ -14,7 +14,7 @@ def insertCheck (userID, link):
     #insert check
     checkID = databaseController.insertInTransaction("checks", "Link, Date, Total, ShopID, UserID, Bill, UserPaid, CategoryID",
                                "%s, %s, %s, %s, %s, %s, %s, %s",
-                               (link, date, total, 1, 1, checkData['bill'], total, 1), cursor)
+                               (link, date, total, 1, 1, checkData['bill'], total, None), cursor)
     
     items = [(checkID, i, ) + checkData['items'][i] for i in range(0, len(checkData['items']))]
 
@@ -26,3 +26,6 @@ def insertCheck (userID, link):
                                            items, cursor)
     return databaseController.commit()
     
+def returnCheck (userID, query):
+    pprint.pprint(databaseController.selectCheckWithItems(userID, query))
+

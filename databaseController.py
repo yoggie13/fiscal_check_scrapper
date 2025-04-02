@@ -65,9 +65,8 @@ def insert (table, propNames, propTypes, props):
     finally:
         mycursor.close()
 
-
 def select (table, what="*", where = None):
-    mycursor = mydb.cursor()
+    mycursor = mydb.cursor(dictionary=True)
 
     try:
         sql = f"SELECT {what} FROM {table} {where if where != None else ''}"
@@ -81,6 +80,38 @@ def select (table, what="*", where = None):
     finally:
         mycursor.close()
 
+def selectCheckWithItems(userID, search, what="*"):
+    try:
+        mycursor = mydb.cursor()
+        mycursor.execute("SHOW COLUMNS FROM checks")
+        checkColumns = [col[0] for col in mycursor.fetchall()]
+        checkColumns.remove("UserID")
+
+        mycursor.execute("SHOW COLUMNS FROM checkitems")
+        checkItemsColumns = [col[0] for col in mycursor.fetchall()]
+
+        where_clause = " OR ".join([f"c.{col} LIKE LOWER(%s)" for col in checkColumns])
+        where2_clause = " OR ".join([f"ci.{col} LIKE LOWER(%s)" for col in checkItemsColumns])
+
+        where = where_clause + " OR " + where2_clause
+
+        sql = f"SELECT DISTINCT c.CheckID, c.Date, c.Total, s.Name FROM checks as c JOIN checkitems as ci ON c.CheckID = ci.CheckID JOIN shops as s ON c.ShopID = s.ShopID WHERE c.UserID = {userID} AND ({where})"
+        search = f"%{search}%".lower()
+
+        mycursor.close()
+        mycursor = mydb.cursor(dictionary=True)
+
+        mycursor.execute(sql, [search] * (len(checkColumns)+len(checkItemsColumns)))
+
+        sqlReturn = mycursor.fetchall()
+
+        return sqlReturn
+    except Exception as e:
+        print(e)
+        return False
+        
+    finally:
+        mycursor.close()
 def update (table, what, value, where, type):
     mycursor = mydb.cursor()
 
