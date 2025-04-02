@@ -33,12 +33,15 @@ def scrape_web_page(link):
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
+    pib = soup.find("span", {"id": "tinLabel"}).text
+    shop = soup.find("span", {"id": "shopFullNameLabel"}).text
+    shop = shop.split("-")
+    shopID = shop[0]
+    shopName = shop[1]
+    checkID = soup.find("span", {"id": "invoiceNumberLabel"}).text
     total = soup.find("span", {"id": "totalAmountLabel"}).text
     date = soup.find("span", {"id": "sdcDateTimeLabel"}).text
     shop = soup.find("span", {"id": "shopFullNameLabel"}).text
-
-    driver.find_element(By.XPATH, "//a[@href='#collapse-specs']").click()
-
     
     table = soup.find("table", {"class": "table invoice-table"})
     tbody = table.find("tbody", {"data-bind": "foreach: Specifications"})
@@ -60,6 +63,10 @@ def scrape_web_page(link):
     bill = div.find("pre").text
 
     return {
+        "PIB": pib.strip(),
+        "shopID": shopID.strip(),
+        "shopName": shopName.strip(),
+        "id": checkID.strip(),
         "total" : total.strip(),
         "bill" : bill,
         "date" : date.strip(),

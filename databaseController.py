@@ -33,9 +33,10 @@ def commit():
         mydb.rollback()
         transactionCheck =  True
 
-def insertInTransaction (table, propNames, propTypes, props, mycursor):
-
-    sql = f"INSERT INTO {table} ({propNames}) VALUES ({propTypes})" 
+def insertInTransaction (table, propNames, props, mycursor):
+    
+    ss = ", ".join(["%s"] * len(propNames.split(", ")))
+    sql = f"INSERT INTO {table} ({propNames}) VALUES ({ss})"
 
     try:
         if type(props) == tuple:
@@ -65,22 +66,22 @@ def insert (table, propNames, propTypes, props):
     finally:
         mycursor.close()
 
-def select (table, what="*", where = None):
+def select (table,  where = None, what="*", groupBy=None):
     mycursor = mydb.cursor(dictionary=True)
 
     try:
-        sql = f"SELECT {what} FROM {table} {where if where != None else ''}"
+        sql = f"SELECT {what} FROM {table} {f'WHERE {where}' if where != None else ''} {f'GROUP BY {groupBy}' if groupBy != None else ''}"
         mycursor.execute(sql)
-        return True
+        return mycursor.fetchall()
 
     except Exception as e:
         print(e)
-        return False
+        return []
         
     finally:
         mycursor.close()
 
-def selectCheckWithItems(userID, search, what="*"):
+def searchChecksWithItems(userID, search, what="*"):
     try:
         mycursor = mydb.cursor()
         mycursor.execute("SHOW COLUMNS FROM checks")
@@ -95,7 +96,7 @@ def selectCheckWithItems(userID, search, what="*"):
 
         where = where_clause + " OR " + where2_clause
 
-        sql = f"SELECT DISTINCT c.CheckID, c.Date, c.Total, s.Name FROM checks as c JOIN checkitems as ci ON c.CheckID = ci.CheckID JOIN shops as s ON c.ShopID = s.ShopID WHERE c.UserID = {userID} AND ({where})"
+        sql = f"SELECT DISTINCT c.CheckID, c.Date, c.UserPaid, c.Total, s.Name FROM checks as c JOIN checkitems as ci ON c.CheckID = ci.CheckID JOIN shops as s ON c.ShopID = s.ShopID AND c.PIB = s.PIB WHERE c.UserID = {userID} AND ({where})"
         search = f"%{search}%".lower()
 
         mycursor.close()
@@ -112,15 +113,20 @@ def selectCheckWithItems(userID, search, what="*"):
         
     finally:
         mycursor.close()
-def update (table, what, value, where, type):
+
+def update (table, what, value, where):
     mycursor = mydb.cursor()
 
-    sql = f"UPDATE {table} SET {what} = {value} WHERE {type} = {where}"
+    sql = f"UPDATE {table} SET {what} = {value} WHERE {where}"
+    print(sql)
     
     try:
         mycursor.execute(sql)
         mydb.commit()
+
+        return True
     except Exception as e:
         print(e)
+        return False
     finally:
         mycursor.close()
