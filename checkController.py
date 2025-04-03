@@ -3,7 +3,7 @@ import scrapper
 from datetime import datetime
 import pprint
 
-def insertCheck (userID, link):
+def insertCheck (userID, link, category, favorite):
     checkData = scrapper.scrape_web_page(link)
 
     #conversion to suitable formats
@@ -20,8 +20,8 @@ def insertCheck (userID, link):
                                                cursor)
     
     databaseController.insertInTransaction("checks", 
-                                           "CheckID, Link, Date, Total, ShopID, PIB, UserID, Bill, UserPaid, CategoryID",
-                                            (checkData["id"], link, date, total, checkData["shopID"], checkData["PIB"], 1, checkData['bill'], total, 5), 
+                                           "CheckID, Link, Date, Total, ShopID, PIB, UserID, Bill, UserPaid, CategoryID, Favorite",
+                                            (checkData["id"], link, date, total, checkData["shopID"], checkData["PIB"], 1, checkData['bill'], total, category, favorite), 
                                             cursor)
     
     items = [(checkData["id"], i, ) + checkData['items'][i] for i in range(0, len(checkData['items']))]

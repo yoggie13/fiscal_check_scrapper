@@ -17,7 +17,7 @@ def receive_code():
 
     data = request.get_json()
 
-    if checkController.insertCheck(1, data['link']):
+    if checkController.insertCheck(1, data['link'], 2, True):
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
     else:
         return json.dumps({'success': False}), 500, {'ContentType':'application/json'}
@@ -79,5 +79,5 @@ def get_analytics():
         return json.dumps({}), 404, {'ContentType':'application/json'}
     
 if __name__ == "__main__":
-    app.run(host="192.168.1.4", port="5000", debug=False, threaded = True)
-    # app.run()
+    # app.run(host="192.168.1.4", port="5000", debug=False, threaded = True)
+    app.run()
