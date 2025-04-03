@@ -61,7 +61,7 @@ def getAnalytics (userID, rangeBegin, rangeEnd):
         groupBy="ca.CategoryID"
     )
 
-def getCheckByCategory (userID, categoryID):
+def getChecksByCategory (userID, categoryID):
     checks = databaseController.select(
         table="checks c JOIN shops s ON c.ShopID = s.ShopID AND c.PIB = s.PIB",
         what="c.CheckID, s.Name, c.Date, c.UserPaid, c.Total",

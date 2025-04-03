@@ -23,7 +23,7 @@ def receive_code():
         return json.dumps({'success': False}), 500, {'ContentType':'application/json'}
 
 @app.route("/checks/search", methods=['GET'])
-def receive_search():
+def search():
 
     search = request.args.get("query")
     checks = checkController.searchChecks(1, search)
@@ -59,7 +59,7 @@ def updateCategory():
 def getCheckByCategory():
 
     categoryID = request.args.get("categoryID")
-    checks  = checkController.getCheckByCategory(1, categoryID)
+    checks  = checkController.getChecksByCategory(1, categoryID)
 
     if len(checks) > 0:
         return json.dumps(checks), 200, {'ContentType':'application/json'}
