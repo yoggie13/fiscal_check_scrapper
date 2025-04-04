@@ -1,6 +1,7 @@
 import databaseController
 import scrapper
 from datetime import datetime
+import base64
 import pprint
 
 def insertCheck (userID, link, category, favorite):
@@ -18,10 +19,11 @@ def insertCheck (userID, link, category, favorite):
                                                "PIB, ShopID, Name", 
                                                (checkData["PIB"], checkData['shopID'], checkData['shopName']), 
                                                cursor)
-    
+    pprint.pprint(checkData['QR'])
     databaseController.insertInTransaction("checks", 
-                                           "CheckID, Link, Date, Total, ShopID, PIB, UserID, Bill, UserPaid, CategoryID, Favorite",
-                                            (checkData["id"], link, date, total, checkData["shopID"], checkData["PIB"], 1, checkData['bill'], total, category, favorite), 
+                                           "CheckID, Link, Date, Total, ShopID, PIB, UserID, Bill, UserPaid, CategoryID, Favorite, QR",
+                                            (checkData["id"], link, date, total, checkData["shopID"], 
+                                             checkData["PIB"], 1, checkData['bill'], total, category, favorite, base64.b64decode(checkData['QR'])), 
                                             cursor)
     
     items = [(checkData["id"], i, ) + checkData['items'][i] for i in range(0, len(checkData['items']))]
@@ -45,10 +47,11 @@ def searchChecks (userID, query):
 def getCheck(check_id):
     data = databaseController.select("checks c JOIN shops s on c.ShopID = s.ShopID AND c.PIB = s.PIB", 
                                      f"CheckID = '{check_id}'",
-                                     "c.CheckID, c.UserPaid, c.Date, c.Link, c.Bill, s.Name")
+                                     "c.CheckID, c.UserPaid, c.Date, c.Link, c.Bill, s.Name, c.QR")
     if(len(data) == 0): return {}
     else: 
         data = data[0]
+        data['QR'] = base64.b64encode(data['QR']).decode('utf-8')
         data['Date'] = data['Date'].isoformat()
         return data
 

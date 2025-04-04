@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 from selenium.webdriver.common.by import By
+import pprint
 
 
 def scrape_web_page(link):
@@ -63,7 +64,12 @@ def scrape_web_page(link):
         items.append(item)
         
     div = soup.findAll("div", {"class": "col-lg-12 text-center centered"})[1]
-    bill = div.find("pre").text
+    billWithQR = div.find("pre")
+
+    bill = billWithQR.text
+    QR = billWithQR.find("img")['src'][21:]
+
+    pprint.pprint(QR)
 
     return {
         "PIB": pib.strip(),
@@ -74,5 +80,6 @@ def scrape_web_page(link):
         "bill" : bill,
         "date" : date.strip(),
         "shop" : shop.strip(),
-        "items" : items
+        "items" : items,
+        "QR":QR
     }
