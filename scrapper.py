@@ -30,6 +30,7 @@ def scrape_web_page(link):
         )
     except:
         print("Timeout: No rows found in tbody")
+        return False
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
@@ -50,8 +51,10 @@ def scrape_web_page(link):
     items = []
 
     for tr in trs:
+        names = tr.find("strong", {"data-bind": "text: Name"}).text.strip().split(" ")
+        name = " ".join([names[i] for i in range(1, len(names)-1)])
         item = (
-            tr.find("strong", {"data-bind": "text: Name"}).text.strip(),
+            name,
             float(tr.find("td", {"data-bind": "decimalAsText: Quantity"}).text.strip().replace(".", "").replace(",",".")),
             float(tr.find("td", {"data-bind": "decimalAsText: UnitPrice"}).text.strip().replace(".", "").replace(",",".")),
             float(tr.find("td", {"data-bind": "decimalAsText: Total"}).text.strip().replace(".", "").replace(",","."))
