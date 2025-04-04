@@ -51,7 +51,7 @@ def getCheck(check_id):
     if(len(data) == 0): return {}
     else: 
         data = data[0]
-        data['QR'] = base64.b64encode(data['QR']).decode('utf-8')
+        data['QR'] = 'data:image/gif;base64,' + base64.b64encode(data['QR']).decode('utf-8')
         data['Date'] = data['Date'].isoformat()
         return data
 
