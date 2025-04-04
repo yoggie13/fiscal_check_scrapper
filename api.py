@@ -6,6 +6,8 @@ from flask_cors import CORS
 import scrapper
 import json
 import checkController
+import pprint
+
 
 app = Flask(__name__)
 CORS(app)
@@ -32,6 +34,15 @@ def search():
         return json.dumps(checks), 200, {'ContentType':'application/json'}
     else:
         return json.dumps({}), 404, {'ContentType':'application/json'}
+
+@app.route("/checks/<check_id>", methods=['GET'])
+def getCheck(check_id):
+    data = checkController.getCheck(check_id)
+    if data:
+        return json.dumps({'success':data}, ensure_ascii=False).encode('utf8'), 200, {'ContentType':'application/json'}
+    else:
+        return json.dumps({}), 404, {'ContentType':'application/json'}
+
 
 @app.route("/checks/userPaid", methods=['PUT'])
 def updateUserPaid():

@@ -42,6 +42,16 @@ def searchChecks (userID, query):
 
     return checks
 
+def getCheck(check_id):
+    data = databaseController.select("checks c JOIN shops s on c.ShopID = s.ShopID AND c.PIB = s.PIB", 
+                                     f"CheckID = '{check_id}'",
+                                     "c.CheckID, c.UserPaid, c.Date, c.Link, c.Bill, s.Name")
+    if(len(data) == 0): return {}
+    else: 
+        data = data[0]
+        data['Date'] = data['Date'].isoformat()
+        return data
+
 def updateUserPaid (userID, checkID, userPaid):
     return databaseController.update("checks",
                               "UserPaid",
