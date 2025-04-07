@@ -11,7 +11,7 @@ def insertCheck (userID, link, category, favorite):
     date = datetime.strptime(checkData["date"], "%d.%m.%Y. %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
     total = float(checkData['total'].replace(".","").replace(",","."))
 
-    cursor = databaseController.start_transaction()
+    [conn, cursor] = databaseController.start_transaction()
 
     #insert check
     if len(databaseController.select("shops", f"ShopID = {checkData['shopID']} AND PIB = {checkData['PIB']}")) == 0:
@@ -34,7 +34,7 @@ def insertCheck (userID, link, category, favorite):
                                            items, 
                                            cursor)
     
-    return databaseController.commit()
+    return databaseController.commit(conn)
     
 def searchChecks (userID, query):
     checks = databaseController.searchChecksWithItems(userID, query)
@@ -69,7 +69,7 @@ def updateCategory (userID, checkID, categoryID):
 
 def getAnalytics (userID, rangeBegin, rangeEnd):
     return databaseController.select(
-        table="categories ca LEFT JOIN checks c ON ca.CategoryID = c.CategoryID" + f" AND c.UserID = {userID} AND c.Date BETWEEN {rangeBegin} AND {rangeEnd if rangeEnd != None else 'CURDATE()'}",
+        table="categories ca LEFT JOIN checks c ON ca.CategoryID = c.CategoryID" + f" AND c.UserID = {userID} AND c.Date >= {rangeBegin} AND c.Date <= {rangeEnd if rangeEnd != None else 'DATE_ADD(CURDATE(), INTERVAL 1 DAY)'}",
         what="ca.CategoryID, ca.Name, COALESCE(SUM(c.UserPaid), 0) as TotalSpent",
         groupBy="ca.CategoryID"
     )
@@ -79,6 +79,30 @@ def getChecksByCategory (userID, categoryID):
         table="checks c JOIN shops s ON c.ShopID = s.ShopID AND c.PIB = s.PIB",
         what="c.CheckID, s.Name, c.Date, c.UserPaid, c.Total",
         where=f"c.CategoryID = {categoryID}"
+    )
+
+    for i in range(0, len(checks)):
+        checks[i]['Date'] = checks[i]['Date'].isoformat()
+
+    return checks
+
+def getRecentChecks(userID):
+    checks = databaseController.select(
+            table="checks c JOIN shops s ON c.ShopID = s.ShopID AND c.PIB = s.PIB JOIN categories ca on c.CategoryID = ca.CategoryID",
+            what="c.CheckID, s.Name as ShopName, c.Date, c.UserPaid, c.Total, ca.Name as CategoryName, ca.CategoryID",
+            where=f"c.UserID = {userID} AND c.Date >= NOW() - INTERVAL 7 day"
+    )
+
+    for i in range(0, len(checks)):
+        checks[i]['Date'] = checks[i]['Date'].isoformat()
+
+    return checks
+
+def getChecks(userID):
+    checks = databaseController.select(
+            table="checks c JOIN shops s ON c.ShopID = s.ShopID AND c.PIB = s.PIB JOIN categories ca on c.CategoryID = ca.CategoryID",
+            what="c.CheckID, s.Name as ShopName, c.Date, c.UserPaid, c.Total, ca.Name as CategoryName, ca.CategoryID",
+            where=f"c.UserID = {userID} ORDER BY c.DATE"
     )
 
     for i in range(0, len(checks)):

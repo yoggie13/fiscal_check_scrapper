@@ -24,11 +24,11 @@ def receive_code():
     else:
         return json.dumps({'success': False}), 500, {'ContentType':'application/json'}
 
-@app.route("/checks/search", methods=['GET'])
-def search():
+@app.route("/checks/<user_id>/search", methods=['GET'])
+def search(user_id):
 
     search = request.args.get("query")
-    checks = checkController.searchChecks(1, search)
+    checks = checkController.searchChecks(user_id, search)
 
     if len(checks)>0:
         return json.dumps(checks), 200, {'ContentType':'application/json'}
@@ -39,10 +39,25 @@ def search():
 def getCheck(check_id):
     data = checkController.getCheck(check_id)
     if data:
-        return json.dumps({'success':data}, ensure_ascii=False).encode('utf8'), 200, {'ContentType':'application/json'}
+        return json.dumps(data, ensure_ascii=False).encode('utf8'), 200, {'ContentType':'application/json'}
     else:
         return json.dumps({}), 404, {'ContentType':'application/json'}
 
+@app.route("/checks/recent/<user_id>", methods=['GET'])
+def getRecentChecks(user_id):
+    data = checkController.getRecentChecks(user_id)
+    if data:
+        return json.dumps(data, ensure_ascii=False).encode('utf8'), 200, {'ContentType':'application/json'}
+    else:
+        return json.dumps({}), 404, {'ContentType':'application/json'}
+
+@app.route("/checks/all/<user_id>", methods=['GET'])
+def getAllChecks(user_id):
+    data = checkController.getChecks(user_id)
+    if data:
+        return json.dumps(data, ensure_ascii=False).encode('utf8'), 200, {'ContentType':'application/json'}
+    else:
+        return json.dumps({}), 404, {'ContentType':'application/json'}
 
 @app.route("/checks/userPaid", methods=['PUT'])
 def updateUserPaid():
@@ -85,10 +100,10 @@ def get_analytics():
     data = checkController.getAnalytics(1, rangeBegin, rangeEnd)
 
     if len(data)>0:
-        return json.dumps(data), 200, {'ContentType':'application/json'}
+        return json.dumps(data, ensure_ascii=False).encode('utf8'), 200, {'ContentType':'application/json'}
     else:
         return json.dumps({}), 404, {'ContentType':'application/json'}
     
 if __name__ == "__main__":
-    # app.run(host="192.168.1.4", port="5000", debug=False, threaded = True)
-    app.run()
+    app.run(host="192.168.1.4", port="5000", debug=False, threaded = True)
+    # app.run()
