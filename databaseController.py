@@ -83,7 +83,6 @@ def select (table,  where = None, what="*", groupBy=None):
         with connection_pool.get_connection() as conn:
             with conn.cursor(dictionary=True) as mycursor:
                 sql = f"SELECT {what} FROM {table} {f'WHERE {where}' if where != None else ''} {f'GROUP BY {groupBy}' if groupBy != None else ''}"
-                print(sql)
                 mycursor.execute(sql)
                 return mycursor.fetchall()
 

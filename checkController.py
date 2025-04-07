@@ -69,7 +69,7 @@ def updateCategory (userID, checkID, categoryID):
 
 def getAnalytics (userID, rangeBegin, rangeEnd):
     return databaseController.select(
-        table="categories ca LEFT JOIN checks c ON ca.CategoryID = c.CategoryID" + f" AND c.UserID = {userID} AND c.Date >= {rangeBegin} AND c.Date <= {rangeEnd if rangeEnd != None else 'DATE_ADD(CURDATE(), INTERVAL 1 DAY)'}",
+        table="categories ca LEFT JOIN checks c ON ca.CategoryID = c.CategoryID" + f" AND c.UserID = {userID} AND c.Date >= {rangeBegin} AND c.Date <= {'DATE_ADD('+rangeEnd+', INTERVAL 1 DAY)' if rangeEnd != None else 'DATE_ADD(CURDATE(), INTERVAL 1 DAY)'}",
         what="ca.CategoryID, ca.Name, COALESCE(SUM(c.UserPaid), 0) as TotalSpent",
         groupBy="ca.CategoryID"
     )
