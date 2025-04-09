@@ -45,15 +45,18 @@ def searchChecks (userID, query):
     return checks
 
 def getCheck(check_id):
-    data = databaseController.select("checks c JOIN shops s on c.ShopID = s.ShopID AND c.PIB = s.PIB", 
+    checkData = databaseController.select("checks c JOIN shops s on c.ShopID = s.ShopID AND c.PIB = s.PIB JOIN categories ca on c.CategoryID = ca.CategoryID", 
                                      f"CheckID = '{check_id}'",
-                                     "c.CheckID, c.UserPaid, c.Date, c.Link, c.Bill, s.Name, c.QR")
-    if(len(data) == 0): return {}
+                                     "c.CheckID, c.UserPaid, c.Date, c.Link, c.Bill, s.Name as ShopName, c.QR, ca.CategoryID, ca.Name as CategoryName")
+    if(len(checkData) == 0): return {}
     else: 
-        data = data[0]
-        data['QR'] = 'data:image/gif;base64,' + base64.b64encode(data['QR']).decode('utf-8')
-        data['Date'] = data['Date'].isoformat()
-        return data
+        checkData = checkData[0]
+        checkData['QR'] = 'data:image/gif;base64,' + base64.b64encode(checkData['QR']).decode('utf-8')
+        checkData['Date'] = checkData['Date'].isoformat()
+
+        checkData['CheckItems'] = databaseController.select("checkitems", f"CheckID = '{check_id}'")
+        
+        return checkData
 
 def updateUserPaid (userID, checkID, userPaid):
     return databaseController.update("checks",
