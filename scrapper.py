@@ -69,7 +69,6 @@ def scrape_web_page(link):
     bill = billWithQR.text
     QR = billWithQR.find("img")['src'][21:]
 
-    pprint.pprint(QR)
 
     return {
         "PIB": pib.strip(),

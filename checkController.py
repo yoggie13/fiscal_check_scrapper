@@ -47,8 +47,9 @@ def searchChecks (userID, query):
 def getCheck(check_id):
     checkData = databaseController.select("checks c JOIN shops s on c.ShopID = s.ShopID AND c.PIB = s.PIB JOIN categories ca on c.CategoryID = ca.CategoryID", 
                                      f"CheckID = '{check_id}'",
-                                     "c.CheckID, c.UserPaid, c.Date, c.Link, c.Bill, s.Name as ShopName, c.QR, ca.CategoryID, ca.Name as CategoryName")
+                                     "c.CheckID, c.UserPaid, c.Date, c.Link, c.Bill, c.Favorite, s.Name as ShopName, c.QR, ca.CategoryID, ca.Name as CategoryName")
     if(len(checkData) == 0): return {}
+
     else: 
         checkData = checkData[0]
         checkData['QR'] = 'data:image/gif;base64,' + base64.b64encode(checkData['QR']).decode('utf-8')
@@ -68,6 +69,11 @@ def updateCategory (userID, checkID, categoryID):
     return databaseController.update("checks",
                               "CategoryID",
                               categoryID,
+                              f"CheckID = '{checkID}' AND UserID = {userID}")
+def updateFavorite (userID, checkID, favorite):
+    return databaseController.update("checks",
+                              "Favorite",
+                              favorite,
                               f"CheckID = '{checkID}' AND UserID = {userID}")
 
 def getAnalytics (userID, rangeBegin, rangeEnd):

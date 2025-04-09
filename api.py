@@ -80,6 +80,16 @@ def updateCategory():
         return json.dumps({}), 200, {'ContentType':'application/json'}
     else:
         return json.dumps({}), 500, {'ContentType':'application/json'}
+    
+@app.route("/checks/<check_id>/favorite", methods=['PUT'])
+def updateFavorite(check_id):
+
+    value = request.args.get("value")
+
+    if checkController.updateFavorite(1, check_id, value):
+        return json.dumps({}), 200, {'ContentType':'application/json'}
+    else:
+        return json.dumps({}), 500, {'ContentType':'application/json'}
 
 @app.route("/checks/category", methods=['GET'])
 def getCheckByCategory():

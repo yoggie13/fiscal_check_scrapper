@@ -127,7 +127,6 @@ def update (table, what, value, where):
     mycursor = conn.cursor()
 
     sql = f"UPDATE {table} SET {what} = {value} WHERE {where}"
-    print(sql)
     
     try:
         mycursor.execute(sql)
