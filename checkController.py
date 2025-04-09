@@ -70,6 +70,7 @@ def updateCategory (userID, checkID, categoryID):
                               "CategoryID",
                               categoryID,
                               f"CheckID = '{checkID}' AND UserID = {userID}")
+
 def updateFavorite (userID, checkID, favorite):
     return databaseController.update("checks",
                               "Favorite",
@@ -118,3 +119,9 @@ def getChecks(userID):
         checks[i]['Date'] = checks[i]['Date'].isoformat()
 
     return checks
+
+def deleteACheck(userID, checkID):
+    return databaseController.delete("checks", f"CheckID = '{checkID}' AND UserID = {userID}")
+
+def getCategories():
+    return databaseController.select("categories")

@@ -123,19 +123,27 @@ def searchChecksWithItems(userID, search, what="*"):
 
 
 def update (table, what, value, where):
-    conn = connection_pool.get_connection()
-    mycursor = conn.cursor()
-
-    sql = f"UPDATE {table} SET {what} = {value} WHERE {where}"
-    
     try:
-        mycursor.execute(sql)
-        conn.commit()
+        with connection_pool.get_connection() as conn:
+            with conn.cursor() as mycursor:
+                sql = f"UPDATE {table} SET {what} = {value} WHERE {where}"
+                mycursor.execute(sql)
+                conn.commit()
 
         return True
     except Exception as e:
         print(e)
         return False
-    finally:
-        mycursor.close() 
-        conn.close()
+
+def delete (table, where):
+    try:
+        with connection_pool.get_connection() as conn:
+            with conn.cursor() as mycursor:
+                sql = f"DELETE FROM {table} WHERE {where}"
+                mycursor.execute(sql)
+                conn.commit()
+
+        return True
+    except Exception as e:
+        print(e)
+        return False

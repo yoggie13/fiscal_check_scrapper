@@ -19,7 +19,7 @@ def receive_code():
 
     data = request.get_json()
 
-    if checkController.insertCheck(1, data['link'], 2, True):
+    if checkController.insertCheck(1, data['link'], 2, False):
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
     else:
         return json.dumps({'success': False}), 500, {'ContentType':'application/json'}
@@ -70,23 +70,22 @@ def updateUserPaid():
     else:
         return json.dumps({}), 500, {'ContentType':'application/json'}
 
-@app.route("/checks/category", methods=['PUT'])
-def updateCategory():
+@app.route("/checks/<check_id>/<user_id>/categories", methods=['PUT'])
+def updateCategory(check_id, user_id):
 
-    categoryID = request.args.get("categoryID")
-    checkID = request.args.get("checkID")
+    categoryID = request.args.get("category")
 
-    if checkController.updateCategory(1, checkID, categoryID):
+    if checkController.updateCategory(user_id, check_id, categoryID):
         return json.dumps({}), 200, {'ContentType':'application/json'}
     else:
         return json.dumps({}), 500, {'ContentType':'application/json'}
     
-@app.route("/checks/<check_id>/favorite", methods=['PUT'])
-def updateFavorite(check_id):
+@app.route("/checks/<check_id>/<user_id>/favorite", methods=['PUT'])
+def updateFavorite(check_id, user_id):
 
     value = request.args.get("value")
 
-    if checkController.updateFavorite(1, check_id, value):
+    if checkController.updateFavorite(user_id, check_id, value):
         return json.dumps({}), 200, {'ContentType':'application/json'}
     else:
         return json.dumps({}), 500, {'ContentType':'application/json'}
@@ -102,6 +101,17 @@ def getCheckByCategory():
     else:
         return json.dumps([]), 404, {'ContentType':'application/json'}        
 
+@app.route("/categories", methods=['GET'])
+def getCategories():
+
+    categories = checkController.getCategories()
+
+    if len(categories) > 0:
+        return json.dumps(categories), 200, {'ContentType':'application/json'}
+    else:
+        return json.dumps([]), 404, {'ContentType':'application/json'}        
+
+
 @app.route("/analytics", methods=['GET'])
 def get_analytics():
 
@@ -113,6 +123,14 @@ def get_analytics():
         return json.dumps(data, ensure_ascii=False).encode('utf8'), 200, {'ContentType':'application/json'}
     else:
         return json.dumps({}), 404, {'ContentType':'application/json'}
+    
+@app.route("/checks/<check_id>/<user_id>", methods=['DELETE'])
+def deleteACheck(check_id, user_id):
+
+    if checkController.deleteACheck(user_id, check_id):
+        return json.dumps({}), 200, {'ContentType':'application/json'}
+    else:
+        return json.dumps({}), 500, {'ContentType':'application/json'}
     
 if __name__ == "__main__":
     app.run(host="192.168.1.4", port="5000", debug=False, threaded = True)
