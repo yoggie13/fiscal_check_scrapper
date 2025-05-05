@@ -19,7 +19,6 @@ def insertCheck (userID, link, category, favorite):
                                                "PIB, ShopID, Name", 
                                                (checkData["PIB"], checkData['shopID'], checkData['shopName']), 
                                                cursor)
-    pprint.pprint(checkData['QR'])
     databaseController.insertInTransaction("checks", 
                                            "CheckID, Link, Date, Total, ShopID, PIB, UserID, Bill, UserPaid, CategoryID, Favorite, QR",
                                             (checkData["id"], link, date, total, checkData["shopID"], 

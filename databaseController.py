@@ -59,24 +59,21 @@ def insertInTransaction (table, propNames, props, mycursor):
         transactionCheck = False
 
 
-def insert (table, propNames, propTypes, props):
-    conn = connection_pool.get_connection()
-    mycursor = conn.cursor()
-
-    sql = f"INSERT INTO {table} ({propNames}) VALUES ({propTypes})" 
+def insert (table, propNames, props):
 
     try:
-        if type(props) == tuple:
-            mycursor.execute(sql, props)
-        else:
-            mycursor.executemany(sql, props)
-        return True
+        with connection_pool.get_connection() as conn:
+            with conn.cursor() as mycursor:
+                ss = ", ".join(["%s"] * len(propNames.split(", ")))
+                sql = f"INSERT INTO {table} ({propNames}) VALUES ({ss})" 
+
+                mycursor.execute(sql, props)
+                conn.commit()
+                return True
     except Exception as e:
         print(e)
         return False
-    finally:
-        mycursor.close() 
-        conn.close()
+         
 
 def select (table,  where = None, what="*", groupBy=None):
     try:

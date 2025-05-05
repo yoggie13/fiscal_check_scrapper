@@ -7,12 +7,21 @@ import scrapper
 import json
 import checkController
 import pprint
+import userController
 
 
 app = Flask(__name__)
 CORS(app)
 # api = Api(app)
 
+@app.route("/auth", methods=["POST"])
+def login_user():
+    data = request.get_json()
+    userData = userController.loginUser(data)
+    if userData != {}:
+        return json.dumps(userData, ensure_ascii=False).encode('utf8'), 200, {'ContentType':'application/json'}
+    else: 
+        return json.dumps({}), 500, {'ContentType':'application/json'}
 
 @app.route("/scan", methods=['POST'])
 def receive_code():
@@ -112,12 +121,12 @@ def getCategories():
         return json.dumps([]), 404, {'ContentType':'application/json'}        
 
 
-@app.route("/analytics", methods=['GET'])
-def get_analytics():
+@app.route("/<user_id>/analytics", methods=['GET'])
+def get_analytics(user_id):
 
     rangeBegin = request.args.get("begin")
     rangeEnd = request.args.get('end')
-    data = checkController.getAnalytics(1, rangeBegin, rangeEnd)
+    data = checkController.getAnalytics(user_id, rangeBegin, rangeEnd)
 
     if len(data)>0:
         return json.dumps(data, ensure_ascii=False).encode('utf8'), 200, {'ContentType':'application/json'}
@@ -133,5 +142,5 @@ def deleteACheck(check_id, user_id):
         return json.dumps({}), 500, {'ContentType':'application/json'}
     
 if __name__ == "__main__":
-    app.run(host="192.168.1.4", port="5000", debug=False, threaded = True)
+    app.run(host="192.168.1.6", port="5000", debug=False, threaded = True)
     # app.run()
